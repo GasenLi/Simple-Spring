@@ -1,9 +1,12 @@
 package org.gasen.IOC.Factory;
 
 import com.sun.xml.internal.bind.v2.model.core.ID;
+import org.dom4j.DocumentException;
+import org.dom4j.io.SAXReader;
 import org.gasen.IOC.Factory.Interface.ApplicationContextInterface;
 import org.gasen.IOC.Factory.Interface.BeanRegisterInterface;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -13,44 +16,29 @@ import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ApplicationContext implements ApplicationContextInterface, BeanRegisterInterface {
-    private Map<String, Object> instanceMapping = new ConcurrentHashMap<>();
+    public Map<String, Object> instanceMapping = new ConcurrentHashMap<>();
 
     //保存所有的Bean
-    private List<Bean> beans = new ArrayList<>();
+    public List<Bean> beans = new ArrayList<>();
 
     //配置文件
-    private Properties config = new Properties();
+    //private Properties config = new Properties();
 
-    public ApplicationContext(String location){
-        InputStream inputStream = null;
+    public ApplicationContext(String location) {
 
-        try{
-            inputStream = this.getClass().getResourceAsStream(location);
+            register(location);
 
-            config.load(inputStream);
-
-            register();
-
+            //初始化Bean
             createBean();
 
+            //依赖注入
             implant();
-
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }finally {
-            try{
-                inputStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
 
     }
 
-    private void register(){
+    private void register(String location){
         BeanParser beanParser = new BeanParser(this);
-        beanParser.parse(config);
+        beanParser.parse(location);
     }
 
     private void createBean(){
@@ -59,13 +47,13 @@ public class ApplicationContext implements ApplicationContextInterface, BeanRegi
     }
 
     private void implant(){
-        Implant implant = new Implant();
-        implant.implant(instanceMapping);
+        Implant implant = new Implant(this);
+        implant.implant();
     }
 
     @Override
     public Object getBean(String ID) {
-        return null;
+        return instanceMapping.get(ID);
     }
 
     @Override
