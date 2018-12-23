@@ -1,7 +1,8 @@
-import org.gasen.Example.Entity.Class;
-import org.gasen.Example.Entity.Student;
+import Entity.Class;
+import Entity.Student;
 import org.gasen.IOC.Factory.ApplicationContext;
-import org.junit.jupiter.api.Test;
+
+import java.util.Date;
 
 public class SpringTest {
 
@@ -14,5 +15,6 @@ public class SpringTest {
         System.out.println(student);
         System.out.println(student.getTheClass());
         System.out.println(c);
+
     }
 }

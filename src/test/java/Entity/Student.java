@@ -1,4 +1,4 @@
-package org.gasen.Example.Entity;
+package Entity;
 
 import java.util.Date;
 
@@ -29,5 +29,10 @@ public class Student {
 
     public void setTheClass(Class theClass) {
         this.theClass = theClass;
+    }
+
+    @Override
+    public String toString() {
+        return this.studentName + " " +super.toString();
     }
 }

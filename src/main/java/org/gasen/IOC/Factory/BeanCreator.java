@@ -2,6 +2,8 @@ package org.gasen.IOC.Factory;
 
 import org.gasen.IOC.Factory.Interface.BeanRegisterInterface;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 
 public class BeanCreator {
@@ -23,4 +25,6 @@ public class BeanCreator {
 
         this.register.registerInstanceMapping(bean.getID(), instance);
     }
+
+
 }

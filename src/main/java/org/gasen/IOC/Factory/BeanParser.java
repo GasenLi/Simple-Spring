@@ -65,20 +65,22 @@ public class BeanParser {
             Element beanNode = elementIterator.next();
 
             List<Attribute> beanAttrList = beanNode.attributes();
-            String ID = null, aclass = null;
+            String ID = null, aclass = null, init_method = null;
             for (Attribute beanAttr : beanAttrList) {
                 String attrName = beanAttr.getName();
 
                 switch (attrName){
                     case "id" : ID = beanAttr.getValue();break;
                     case "class" : aclass = beanAttr.getValue();break;
+                    case "init-method" : init_method = beanAttr.getValue();break;
                 }
             }
 
             Bean bean = null;
             if(ID!=null && aclass!=null){
-                bean = doRegisterBean(ID, aclass);
+                bean = doRegisterBean(ID, aclass, init_method);
             }
+
 
 
             //遍历Property
@@ -89,18 +91,21 @@ public class BeanParser {
                     Element beanProperNode = beanAttrIterator.next();
 
                     List<Attribute> beanProperList = beanProperNode.attributes();
-                    String name = null, reference = null;
+                    String name = null, reference = null, value = null;
                     for (Attribute beanProper : beanProperList) {
                         String attrName = beanProper.getName();
 
                         switch (attrName){
                             case "name" : name = beanProper.getValue();break;
                             case "ref" : reference = beanProper.getValue();break;
+                            case "value" : value = beanProper.getValue();break;
                         }
                     }
 
                     if(name!=null && reference!=null){
                         doRegisterProperty(bean, name, reference);
+                    }else if(name!=null && value!=null){
+                        doRegisterPropertyWithValue(bean, name, value);
                     }
                 }
             }
@@ -109,11 +114,17 @@ public class BeanParser {
     }
 
     //存储Bean
-    private Bean doRegisterBean(String ID, String aclass){
+    private Bean doRegisterBean(String ID, String aclass, String init_method){
         try {
             Class c = Class.forName(aclass);
 
-            Bean bean = new Bean(ID, c);
+            Bean bean;
+            if(init_method == null){
+                bean = new Bean(ID, c);
+            }else {
+                bean = new Bean(ID, c, init_method);
+            }
+
             beans.add(bean);
 
             return bean;
@@ -123,19 +134,28 @@ public class BeanParser {
 
         return null;
     }
+    
+    
 
     //存储Property
-    private void doRegisterProperty(Bean implantedbean, String name, String reference){
+    private void doRegisterProperty(Bean implantedBean, String name, String reference){
         Property property;
 
         for(Bean implantBean : this.beans){
             if(reference.equals(implantBean.getID())){
                 property = new Property(name, implantBean);
-                implantedbean.setProperty(property);
+                implantedBean.addProperty(property);
 
                 break;
             }
         }
+    }
+    
+    private void doRegisterPropertyWithValue(Bean implantedBean, String name, String value){
+        Property property;
+
+        property = new Property(name, value);
+        implantedBean.addProperty(property);
     }
 
     private void doRegister(String packageName) {

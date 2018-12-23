@@ -9,6 +9,8 @@ import org.gasen.IOC.Factory.Interface.BeanRegisterInterface;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +36,17 @@ public class ApplicationContext implements ApplicationContextInterface, BeanRegi
             //依赖注入
             implant();
 
+            //执行默认方法
+            defaultMethod();
+
+    }
+
+    private void defaultMethod(){
+        for(Bean bean: beans){
+            if(bean.getInit_method()!=null){
+                runInitMethod(bean.getInit_method(), instanceMapping.get(bean.getID()));
+            }
+        }
     }
 
     private void register(String location){
@@ -49,6 +62,20 @@ public class ApplicationContext implements ApplicationContextInterface, BeanRegi
     private void implant(){
         Implant implant = new Implant(this);
         implant.implant();
+    }
+
+    //运行默认方法
+    private void runInitMethod(String init_method, Object instance){
+        try {
+            Method initMethod = instance.getClass().getMethod(init_method, new Class[]{});
+            initMethod.invoke(instance, new Object[]{});
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

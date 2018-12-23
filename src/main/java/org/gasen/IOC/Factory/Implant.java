@@ -17,10 +17,10 @@ public class Implant {
         beans = application.beans;
     }
 
-    public void beanImplant(Bean bean){
+    public void beanImplant(Bean bean, Property property){
         try {
-            Field implantedField = instanceMapping.get(bean.getID()).getClass().getDeclaredField(bean.getProperty().getName());
-            Object implantObject = instanceMapping.get(bean.getProperty().getReference().getID());
+            Field implantedField = instanceMapping.get(bean.getID()).getClass().getDeclaredField(property.getName());
+            Object implantObject = instanceMapping.get(property.getReference().getID());
 
             implantedField.setAccessible(true);
             implantedField.set(instanceMapping.get(bean.getID()), implantObject);
@@ -31,12 +31,30 @@ public class Implant {
         }
     }
 
+    public void beanImplantWithNoBean(Bean bean, Property property){
+        try {
+            Field implantedField = instanceMapping.get(bean.getID()).getClass().getDeclaredField(property.getName());
+
+            implantedField.setAccessible(true);
+            implantedField.set(instanceMapping.get(bean.getID()), property.getValue());
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public void implant(){
         for(Bean bean : beans){
-            if(bean.getProperty()!=null){
-                beanImplant(bean);
+            for(Property property : bean.getProperties()){
+                if(property.getReference() != null){
+                    beanImplant(bean, property);
+                }else {
+                    beanImplantWithNoBean(bean, property);
+                }
             }
+
         }
     }
 }
