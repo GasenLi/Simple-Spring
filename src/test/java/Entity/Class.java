@@ -13,7 +13,7 @@ public class Class {
 
     @Override
     public String toString() {
-        return this.classID + " " + super.toString();
+        return "classID : " + this.classID + " " + super.toString();
     }
 
     public void sayWelcome(){

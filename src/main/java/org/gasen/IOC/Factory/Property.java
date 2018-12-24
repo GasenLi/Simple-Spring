@@ -4,15 +4,25 @@ public class Property {
     private String name;
     private Bean reference;
     private String value;
+    private String propertyEditor;
 
     public Property(String name, Bean reference){
         this.name = name;
         this.reference = reference;
     }
 
-    public Property(String name, String value){
+    public Property(String name, String value, String propertyEditor){
         this.name = name;
         this.value = value;
+        this.propertyEditor = propertyEditor;
+    }
+
+    public String getPropertyEditor() {
+        return propertyEditor;
+    }
+
+    public void setPropertyEditor(String propertyEditor) {
+        this.propertyEditor = propertyEditor;
     }
 
     public String getValue() {

@@ -12,6 +12,7 @@
         <beans id="Student" class="Entity.Student">
             <property name="theClass" ref="Class" />
             <property name="studentName" value="小红" />
+            <property name="birthday" value="2018-12-12" propertyEditor="DatePropertyEditor"/>
         </beans>
 
         <!--<context:component-scan base-package="*" use-default-filters="false">-->

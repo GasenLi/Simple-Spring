@@ -15,8 +15,6 @@ import java.util.Iterator;
 import java.util.List;
 
 public class BeanParser {
-    //扫描包的Key
-    public static final String SCAN_PACKAGE = "scanPackage";
 
     //容器注册对象
     private BeanRegisterInterface register;
@@ -29,10 +27,6 @@ public class BeanParser {
     }
 
     public void parse(String location) {
-        //扫描包
-        //String packageName = properties.getProperty(SCAN_PACKAGE);
-        // doRegister(packageName);
-
         Document document = scan(location);
         readXML(document);
         this.register.registerBean(beans);
@@ -91,7 +85,7 @@ public class BeanParser {
                     Element beanProperNode = beanAttrIterator.next();
 
                     List<Attribute> beanProperList = beanProperNode.attributes();
-                    String name = null, reference = null, value = null;
+                    String name = null, reference = null, value = null, propertyEditor = null;
                     for (Attribute beanProper : beanProperList) {
                         String attrName = beanProper.getName();
 
@@ -99,13 +93,14 @@ public class BeanParser {
                             case "name" : name = beanProper.getValue();break;
                             case "ref" : reference = beanProper.getValue();break;
                             case "value" : value = beanProper.getValue();break;
+                            case "propertyEditor" : propertyEditor = beanProper.getValue();break;
                         }
                     }
 
                     if(name!=null && reference!=null){
                         doRegisterProperty(bean, name, reference);
                     }else if(name!=null && value!=null){
-                        doRegisterPropertyWithValue(bean, name, value);
+                        doRegisterPropertyWithValue(bean, name, value, propertyEditor);
                     }
                 }
             }
@@ -137,7 +132,7 @@ public class BeanParser {
     
     
 
-    //存储Property
+    //存储与bean对应的Property
     private void doRegisterProperty(Bean implantedBean, String name, String reference){
         Property property;
 
@@ -150,33 +145,13 @@ public class BeanParser {
             }
         }
     }
-    
-    private void doRegisterPropertyWithValue(Bean implantedBean, String name, String value){
+
+    //存储带值的property
+    private void doRegisterPropertyWithValue(Bean implantedBean, String name, String value, String propertyEditor){
         Property property;
 
-        property = new Property(name, value);
+        property = new Property(name, value, propertyEditor);
         implantedBean.addProperty(property);
     }
 
-    private void doRegister(String packageName) {
-        //获取此包的绝对路径
-        URL url = getClass().getClassLoader().getResource("./" + packageName.replaceAll("\\.", "/"));
-        File packageFile = new File(url.getFile());
-
-        for (File file : packageFile.listFiles()) {
-            if (file.isDirectory()) {
-                doRegister(packageName + "." + file.getName());
-            } else {
-                String className = packageName + "." + file.getName().replaceAll(".class", "").trim();
-
-                List<Bean> beans = BeanGenerator.generate(className);
-
-                if (beans == null) {
-                    continue;
-                } else {
-                    this.register.registerBean(beans);
-                }
-            }
-        }
-    }
 }

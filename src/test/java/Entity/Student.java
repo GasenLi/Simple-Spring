@@ -33,6 +33,6 @@ public class Student {
 
     @Override
     public String toString() {
-        return this.studentName + " " +super.toString();
+        return "studentName: " + this.studentName + "studentBirth: " + this.birthday + " " +super.toString();
     }
 }
